@@ -9,6 +9,25 @@ The data is available via `ScheduledJobController`.
 
 This is just a project demonstrating the tracking. I am considering to build a library that can be included in any spring boot project to enable tracking of scheduled tasks.
 
+## Sample scheduled job
+
+The demo has a very simple scheduled job, that prints *foo* every 5 seconds.
+
+```kotlin
+package com.example.demo
+
+import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.stereotype.Component
+
+@Component
+class ScheduledJob {
+
+    @Scheduled(fixedRate = 5000)
+    fun println() = println("foo")
+
+}
+```
+
 ## Access data via REST
 
 `GET /scheduled-jobs/`
