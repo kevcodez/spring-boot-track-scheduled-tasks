@@ -25,10 +25,13 @@ class ScheduledJobController @Autowired constructor(
     }
 
     @RequestMapping(value = ["{className}/{methodName}"], method = [RequestMethod.GET])
-    fun getScheduledJobsPerMethod(@PathVariable(name = "className") className: String, @PathVariable(name = "methodName") methodName: String): ResponseEntity<Any> {
+    fun getScheduledJob(
+        @PathVariable(name = "className") className: String,
+        @PathVariable(name = "methodName") methodName: String
+    ): ResponseEntity<Any> {
         val scheduledJobs =
             scheduledJobTracker.trackedJobs.filter { it.className == className && it.methodName == methodName }
-        return ResponseEntity.ok(scheduledJobs)
+        return ResponseEntity.ok(scheduledJobs.first())
     }
 
 }

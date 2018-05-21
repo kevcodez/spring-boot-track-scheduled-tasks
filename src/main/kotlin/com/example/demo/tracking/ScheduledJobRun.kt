@@ -1,10 +1,11 @@
 package com.example.demo.tracking
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.Duration
 import java.time.Instant
 import java.util.*
 
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 data class ScheduledJobRun(
     val uuid: UUID,
     val startedAt: Instant,
@@ -12,11 +13,10 @@ data class ScheduledJobRun(
     val exception: Throwable? = null
 ) {
 
-    @JsonProperty("duration")
-    fun duration(): Duration? {
+    fun durationInMs(): Long? {
         if (endedAt == null)
             return null
 
-        return Duration.between(startedAt, endedAt)
+        return Duration.between(startedAt, endedAt).toMillis()
     }
 }

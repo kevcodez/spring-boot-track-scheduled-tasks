@@ -48,21 +48,23 @@ class ScheduledJobTracker {
         return TrackedScheduledJob(
             className = signature.declaringTypeName,
             methodName = signature.method.name,
-            cron = nullIfEmptyString(annotation.cron),
-            fixedRate = nullIfNegativeNumber(annotation.fixedRate),
-            fixedRateString = nullIfEmptyString(annotation.fixedRateString),
-            initialDelay = nullIfNegativeNumber(annotation.initialDelay),
-            initialDelayString = nullIfEmptyString(annotation.initialDelayString),
-            fixedDelay = nullIfNegativeNumber(annotation.fixedDelay),
-            fixedDelayString = nullIfEmptyString(annotation.fixedDelayString)
+            settings = Settings(
+                cron = nullIfEmptyString(annotation.cron),
+                fixedRate = nullIfNegativeNumber(annotation.fixedRate),
+                fixedRateString = nullIfEmptyString(annotation.fixedRateString),
+                initialDelay = nullIfNegativeNumber(annotation.initialDelay),
+                initialDelayString = nullIfEmptyString(annotation.initialDelayString),
+                fixedDelay = nullIfNegativeNumber(annotation.fixedDelay),
+                fixedDelayString = nullIfEmptyString(annotation.fixedDelayString)
+            )
         )
     }
 
-    private fun nullIfEmptyString(str: String) : String? {
+    private fun nullIfEmptyString(str: String): String? {
         return if (str.isEmpty()) null else str
     }
 
-    private fun nullIfNegativeNumber(number: Long) : Long? {
+    private fun nullIfNegativeNumber(number: Long): Long? {
         return if (number < 0) null else number
     }
 

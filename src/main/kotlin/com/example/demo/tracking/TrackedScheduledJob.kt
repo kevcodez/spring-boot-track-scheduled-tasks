@@ -2,6 +2,7 @@ package com.example.demo.tracking
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.time.Duration
 import java.time.Instant
 import java.util.*
 
@@ -9,19 +10,15 @@ import java.util.*
 data class TrackedScheduledJob(
     val className: String,
     val methodName: String,
-    val cron: String?,
-    val fixedRate: Long?,
-    val fixedRateString: String?,
-    val initialDelay: Long?,
-    val initialDelayString: String?,
-    val fixedDelay: Long?,
-    val fixedDelayString: String?,
+    val settings: Settings,
+    val stats: Stats = Stats(),
     val runs: MutableList<ScheduledJobRun> = ArrayList()
 ) {
 
     private val trackingLimit = 10
 
     fun addRun(run: ScheduledJobRun) {
+        stats.numberOfInvocations++
         if (runs.size == trackingLimit)
             runs.removeAt(0)
         runs.add(run)
@@ -33,40 +30,55 @@ data class TrackedScheduledJob(
 
         runs.remove(run)
         runs.add(run.copy(endedAt = endedAt, exception = exception))
+
+        if (exception != null)
+            stats.numberOfExceptions++
+
+        val durationInMillis = Duration.between(run.startedAt, endedAt).toMillis()
+        stats.totalTimeInMs += durationInMillis
+        if (stats.shortestRunDurationInMs == null || durationInMillis < stats.shortestRunDurationInMs!!)
+            stats.shortestRunDurationInMs = durationInMillis
+        if (stats.longestRunDurationInMs == null || durationInMillis > stats.longestRunDurationInMs!!)
+            stats.longestRunDurationInMs = durationInMillis
     }
 
-    @JsonProperty("lastRunStarted")
-    fun lastRunStarted(): Instant? {
-        return runs.maxBy { it.startedAt }?.startedAt
+    @JsonProperty
+    fun lastFinishedRun(): ScheduledJobRun? {
+        return runs.filter { it.endedAt != null }.sortedByDescending { it.startedAt }.firstOrNull()
     }
 
-    @JsonProperty("lastRunEnded")
-    fun lastRunEnded(): Instant? {
-        val endedRuns = runs.filter { it.endedAt != null }
-        return endedRuns.maxBy { it.endedAt!! }?.endedAt
+    @JsonProperty
+    fun latestRun(): ScheduledJobRun? {
+        return runs.sortedByDescending { it.startedAt }.firstOrNull()
     }
 
-    @JsonProperty("lastDurationInMs")
-    fun lastDurationInMs(): Long? {
-        val lastEndedRun = runs.filter { it.endedAt != null }.maxBy { it.endedAt!! }
-
-        return lastEndedRun?.duration()?.toMillis()
+    @JsonProperty("currentlyRunning")
+    fun currentlyRunning(): Boolean {
+        return runs.any { it.endedAt == null }
     }
 
-    @JsonProperty("averageDurationInMs")
-    fun averageDurationInMs(): Double? {
-        val finishedRuns = runs.filter { it.endedAt != null }
+}
 
-        if (finishedRuns.isEmpty())
-            return null
+data class Settings(
+    val cron: String?,
+    val fixedRate: Long?,
+    val fixedRateString: String?,
+    val initialDelay: Long?,
+    val initialDelayString: String?,
+    val fixedDelay: Long?,
+    val fixedDelayString: String?
+)
 
-        return finishedRuns.map { it.duration()!!.toMillis() }.average()
+data class Stats(
+    var numberOfExceptions: Long = 0,
+    var numberOfInvocations: Long = 0,
+    var longestRunDurationInMs: Long? = null,
+    var shortestRunDurationInMs: Long? = null,
+    var totalTimeInMs: Long = 0
+) {
+
+    @JsonProperty("averageDuration")
+    fun averageDurationInMs(): Long? {
+        return totalTimeInMs / numberOfInvocations
     }
-
-    @JsonProperty("status")
-    fun status(): String {
-        val runningCount = runs.count { it.endedAt == null }
-        return if (runningCount == 0) "Idle" else "Running"
-    }
-
 }
