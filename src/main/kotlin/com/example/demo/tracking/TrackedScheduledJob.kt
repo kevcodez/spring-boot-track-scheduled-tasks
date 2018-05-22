@@ -79,6 +79,8 @@ data class Stats(
 
     @JsonProperty("averageDuration")
     fun averageDurationInMs(): Long? {
+        if (numberOfInvocations == 0L)
+            return null
         return totalTimeInMs / numberOfInvocations
     }
 }

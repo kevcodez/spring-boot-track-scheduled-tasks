@@ -27,6 +27,8 @@ class ScheduledJobTrackingAspect @Autowired constructor(
         }
 
         scheduledJobTracker.jobEnd(uuid, signature, exception)
+        if (exception != null)
+            throw exception
     }
 
 }
