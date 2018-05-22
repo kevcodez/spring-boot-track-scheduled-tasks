@@ -21,15 +21,16 @@ data class TrackedScheduledJob(
         stats.numberOfInvocations++
         if (runs.size == trackingLimit)
             runs.removeAt(0)
-        runs.add(run)
+        runs.add(0, run)
     }
 
     fun endRun(uuid: UUID, exception: Throwable?) {
         val endedAt = Instant.now()
         val run = runs.find { it.uuid == uuid } ?: return
 
+        val index = runs.indexOf(run)
         runs.remove(run)
-        runs.add(run.copy(endedAt = endedAt, exception = exception))
+        runs.add(index, run.copy(endedAt = endedAt, exception = exception))
 
         if (exception != null)
             stats.numberOfExceptions++
@@ -77,7 +78,7 @@ data class Stats(
     var totalTimeInMs: Long = 0
 ) {
 
-    @JsonProperty("averageDuration")
+    @JsonProperty
     fun averageDurationInMs(): Long? {
         if (numberOfInvocations == 0L)
             return null

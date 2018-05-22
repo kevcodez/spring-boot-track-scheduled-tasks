@@ -19,4 +19,5 @@ data class ScheduledJobRun(
 
         return Duration.between(startedAt, endedAt).toMillis()
     }
+
 }
