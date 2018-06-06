@@ -20,7 +20,7 @@ data class TrackedScheduledJob(
     fun addRun(run: ScheduledJobRun) {
         stats.numberOfInvocations++
         if (runs.size == trackingLimit)
-            runs.removeAt(0)
+            runs.removeAt(trackingLimit - 1)
         runs.add(0, run)
     }
 
