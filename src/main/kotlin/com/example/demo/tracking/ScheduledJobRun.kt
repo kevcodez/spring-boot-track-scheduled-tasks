@@ -1,6 +1,7 @@
 package com.example.demo.tracking
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -13,7 +14,8 @@ data class ScheduledJobRun(
     val exception: Throwable? = null
 ) {
 
-    fun durationInMs(): Long? {
+    @JsonProperty
+    fun duration(): Long? {
         if (endedAt == null)
             return null
 
