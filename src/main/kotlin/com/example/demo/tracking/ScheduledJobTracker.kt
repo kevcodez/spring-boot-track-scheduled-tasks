@@ -47,6 +47,21 @@ class ScheduledJobTracker @Autowired constructor(
         }
     }
 
+    open fun triggerJob(className: String, methodName: String): Boolean {
+        val job = findJobByClassAndMethod(className, methodName)
+        if (job != null && job.latestRun()?.endedAt == null)
+            return false
+
+        val scheduledTasks = scheduledTaskHolder.scheduledTasks
+        val matchingJob = scheduledTasks
+            .map { it.task.runnable as ScheduledMethodRunnable }
+            .firstOrNull { it.method.declaringClass.name == className && it.method.name == methodName }
+        if (matchingJob != null)
+            matchingJob.run()
+
+        return matchingJob != null
+    }
+
     fun jobStart(signature: MethodSignature): UUID {
         val uuid = UUID.randomUUID()
 

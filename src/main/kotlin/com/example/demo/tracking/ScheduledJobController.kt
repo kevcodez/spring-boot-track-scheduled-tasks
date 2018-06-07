@@ -53,4 +53,20 @@ class ScheduledJobController @Autowired constructor(
         return ResponseEntity.ok(scheduledJobRun)
     }
 
+    @RequestMapping(
+        value = ["{className}/{methodName}"],
+        method = [RequestMethod.POST]
+    )
+    open fun triggerJob(
+        @PathVariable(name = "className") className: String,
+        @PathVariable(name = "methodName") methodName: String
+    ): ResponseEntity<Any> {
+        val successful = scheduledJobTracker.triggerJob(className, methodName)
+
+        if (successful)
+            return ResponseEntity(HttpStatus.OK)
+        else
+            return ResponseEntity(HttpStatus.BAD_REQUEST)
+    }
+
 }
