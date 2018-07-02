@@ -5,32 +5,32 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class ScheduledJob {
+open class ScheduledJob {
 
     @Scheduled(fixedRate = 5000)
-    fun println() = println("foo")
+    open fun println() = println("foo")
 
     @Scheduled(fixedRate = 15000)
-    fun regularJob() = println("Just a regular job")
+    open fun regularJob() = println("Just a regular job")
 
     @Scheduled(fixedRate = 30000)
-    fun longRunningJob() {
+    open fun longRunningJob() {
         Thread.sleep(10000)
     }
 
     @Scheduled(fixedRate = 10000)
-    fun sometimesThrowingException() {
+    open fun sometimesThrowingException() {
         val random = Random().nextInt(10)
         if (random <= 2)
             throw IllegalArgumentException("Random exception")
     }
 
     @Scheduled(fixedRate = 60000)
-    fun alwaysException() {
+    open fun alwaysException() {
         throw IllegalArgumentException("Computer says no")
     }
 
     @Scheduled(initialDelay = 1000000000, fixedRate = 1000000000000000)
-    fun neverRunningJob() = println("never")
+    open fun neverRunningJob() = println("never")
 
 }
