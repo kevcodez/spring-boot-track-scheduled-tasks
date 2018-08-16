@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        kotlinVersion = '1.2.50'
-        springBootVersion = '2.0.3.RELEASE'
+        kotlinVersion = '1.2.60'
+        springBootVersion = '2.0.4.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -13,7 +13,6 @@ buildscript {
 }
 
 apply plugin: 'kotlin'
-apply plugin: 'kotlin-spring'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
